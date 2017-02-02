@@ -70,6 +70,14 @@ window.onload = function() {
 			time.font='20px sans-serif';
 			scene.addChild(time);
 
+			var rank = new Label();
+			rank.text ="ランキング:取得中...";
+			rank.color='#01adb9';
+			rank.x=5000;
+			rank.y=170;
+			rank.font='20px sans-serif';
+			scene.addChild(rank);
+
 			var retry = new Sprite(69,27);
 			retry.image = game_.assets['./img/retry.png'];
 			retry.x=245;
@@ -190,7 +198,9 @@ window.onload = function() {
 						corseClear = 1;
 					}
 					if(board.y>=272){
-						goal=1;
+						if(goal==0){
+							goal=1;
+						}
 						time.x=40;
 						time.y=75;
 						time.font='40px sans-serif';
@@ -307,6 +317,20 @@ window.onload = function() {
 				//ここまでポールの動き
 
 				//ここからゴール後の処理
+				if(goal==1){
+					goal = 2;
+					rank.x = 50;
+					var script = document.createElement("script");
+					script.type = "text/javascript";
+					script.src = "https://script.google.com/macros/s/AKfycbzVUwLkqd9PMXES_2w6IR6tBlcYDOGCGpqlg98JbroJe3kRP8Y/exec?time="+printTime+"&callback=_callback";
+					function callBack(json){
+						console.log(json.response.rank);
+						rank.text = "ランキング:"+json.response.rank+"/"+json.response.total;
+					}
+					window._callback = callBack;
+    			document.body.appendChild(script);
+
+				}
 
 				//ここまでゴール後の処理
       });
