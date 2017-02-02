@@ -4,21 +4,19 @@ window.onload = function() {
 
 	var game_ = new Game(320,320);
 	game_.fps = 30;
-	game_.preload('./img/start.png','./img/bg.png','./img/board.png','./img/ball.png','./img/pole.png','./img/poleb.png');
+	game_.preload('./img/title.png','./img/start.png','./img/started.png','./img/retry.png','./img/bg.png','./img/board.png','./img/ball.png','./img/pole.png','./img/poleb.png');
 
 	game_.onload = function(){
 
 		var createStartScene = function(){
 			var scene = new Scene();
 
-			scene.backgroundColor ='#f0f0f0';
+			scene.backgroundColor ='#f5ffff';
 
-			var title = new Label('スキー');
-			title.textAlign = 'center';
-			title.color = '#c0f020';
-			title.x =0;
-			title.y =96;
-			title.font ='35px sans-serif';
+			var title = new Sprite(179,66);
+			title.image =game_.assets['./img/title.png'];
+			title.x =75;
+			title.y =66;
 			scene.addChild(title);
 
 			var startImage = new Sprite(320,133);
@@ -29,10 +27,13 @@ window.onload = function() {
 			startImage.scaleY =0.5;
 			scene.addChild(startImage);
 
-				startImage.addEventListener('touchstart', function(e){
+			startImage.addEventListener('touchstart', function(e){
+				startImage.image =game_.assets['./img/started.png'];
+			});
 
-					game_.replaceScene(createGameScene());
-				});
+			startImage.addEventListener('touchend', function(e){
+				game_.replaceScene(createGameScene());
+			});
 
 			return scene;
 
@@ -63,16 +64,16 @@ window.onload = function() {
 
 			var time = new Label();
 			time.text ="Time:"+nowTime;
-			time.color='#f70f1f';
+			time.color='#01adb9';
 			time.x=11;
 			time.y=0;
 			time.font='20px sans-serif';
 			scene.addChild(time);
 
-			var retry = new Label('RETRY');
-			retry.color='#874684';
-			retry.x=265;
-			retry.y=0;
+			var retry = new Sprite(69,27);
+			retry.image = game_.assets['./img/retry.png'];
+			retry.x=245;
+			retry.y=-3;
 			scene.addChild(retry);
 
 			var board = new Sprite(15,60);
@@ -88,12 +89,12 @@ window.onload = function() {
 
 			var pole1 = new Sprite(4,4);
 			pole1.image = game_.assets['./img/pole.png'];
-			pole1.x=180;
+			pole1.x=120;
 			pole1.y=350;
 			pole1.scaleX =1;
 			pole1.scaleY =-1;
 			scene.addChild(pole1);
-			
+
 			var pole1b = new Sprite(4,32);
 			pole1b.image = game_.assets['./img/pole.png'];
 			pole1b.x=pole1.x;
@@ -102,21 +103,53 @@ window.onload = function() {
 			pole1b.scaleY =-1;
 			scene.addChild(pole1b);
 
+			var pole3 = new Sprite(4,4);
+			pole3.image = game_.assets['./img/pole.png'];
+			pole3.x=pole1.x-80;
+			pole3.y=pole1.y;
+			pole3.scaleX =1;
+			pole3.scaleY =-1;
+			scene.addChild(pole3);
+
+			var pole3b = new Sprite(4,32);
+			pole3b.image = game_.assets['./img/pole.png'];
+			pole3b.x=pole3.x;
+			pole3b.y=pole3.y-28;
+			pole3b.scaleX =1;
+			pole3b.scaleY =-1;
+			scene.addChild(pole3b);
+
 			var pole2 = new Sprite(4,4);
 			pole2.image = game_.assets['./img/poleb.png'];
-			pole2.x=180;
-			pole2.y=350;
+			pole2.x=200;
+			pole2.y=540;
 			pole2.scaleX =1;
 			pole2.scaleY =-1;
 			scene.addChild(pole2);
-			
+
 			var pole2b = new Sprite(4,32);
 			pole2b.image = game_.assets['./img/poleb.png'];
-			pole2b.x=pole1.x;
-			pole2b.y=pole1.y-28;
+			pole2b.x=pole2.x;
+			pole2b.y=pole2.y-28;
 			pole2b.scaleX =1;
 			pole2b.scaleY =-1;
 			scene.addChild(pole2b);
+
+			var pole4 = new Sprite(4,4);
+			pole4.image = game_.assets['./img/poleb.png'];
+			pole4.x=pole2.x+80;
+			pole4.y=pole2.x;
+			pole4.scaleX =1;
+			pole4.scaleY =-1;
+			scene.addChild(pole4);
+
+			var pole4b = new Sprite(4,32);
+			pole4b.image = game_.assets['./img/poleb.png'];
+			pole4b.x=pole4.x;
+			pole4b.y=pole4.y-28;
+			pole4b.scaleX =1;
+			pole4b.scaleY =-1;
+			scene.addChild(pole4b);
 
 			var ball = new Sprite(40,40);
 			ball.image = game_.assets['./img/ball.png'];
@@ -128,9 +161,13 @@ window.onload = function() {
 
 			var corse = 0;
 			var speed = 1;
+			var corseClear = 0;
+			var poleCount = 0;
+			var nextPole = 0;
+			var goal = 0;
 
 			retry.addEventListener('touchstart',function(e){
-				game_.replaceScene(createGameScene());
+				game_.replaceScene(createStartScene());
 			});
 
 			scene.addEventListener('touchstart',function(e){
@@ -140,19 +177,30 @@ window.onload = function() {
 
 
 			scene.addEventListener('enterframe', function() {
-			
-					nowTime += 0.033333;
+					if(goal==0){
+						nowTime += 0.033333;
+					}
 					var printTime = Math.floor(nowTime*100)/100;
 					time.text ="Time:"+printTime;
 					speed = 10;
 				//ここから背景の動き
 					var bgSpeed = speed*Math.cos(board.rotation*Math.PI/180);
-					
+
+					if(corse >= 4700){
+						corseClear = 1;
+					}
+					if(board.y>=272){
+						goal=1;
+						time.x=40;
+						time.y=75;
+						time.font='40px sans-serif';
+					}
+
 					if(bgSpeed < 0){
 						bgSpeed *= -1;
 					}
 					corse += bgSpeed;
-					if(corse <= 4000){
+					if(corseClear == 0){
 						board.y = 30;
 						if(bg1.y <= -320){
 							bg1.y = 320;
@@ -162,33 +210,105 @@ window.onload = function() {
 						}
 	        	bg1.y -= bgSpeed;
 						bg2.y -= bgSpeed;
-						
-						pole1.y -= bgSpeed;
-						pole1b.y = pole1.y-28;
-						
+
 					}else{
 						board.y += bgSpeed;
 					}
-					console.log(corse);
 				//ここまで背景の動き
-				
+
 				//ここから板の動き
 					if(board.rotation > 72){
 						board.rotation = 72;
 					}else if(board.rotation < -72){
 						board.rotation = -72;
 					}
-	    		
+
 	    		board.rotate(6*dir);
-	    		
+
 	    		board.x -= speed*Math.sin(board.rotation*Math.PI/180);
 					board.scaleX = Math.cos(board.rotation*Math.PI/180);
+
+					if(board.x<=0){
+						board.x=0;
+					}
+					if(board.x>=310){
+						board.x=310;
+					}
 				//ここまで板の動き
-					
+
 				//ここから達磨の動き
 	 				ball.x=board.x-12;
 					ball.y=board.y-10;
 				//ここまで達磨の動き
+
+				//ここからポールの動き
+				if(corseClear == 0){
+					pole1.y -= bgSpeed;
+					pole1b.y = pole1.y-28;
+					pole3.y = pole1.y;
+					pole3b.y = pole3.y-28;
+					pole1b.x = pole1.x;
+					pole3.x = pole1.x - 80;
+					pole3b.x = pole3.x;
+
+					pole2.y -= bgSpeed;
+					pole2b.y = pole2.y-28;
+					pole4.y = pole2.y;
+					pole4b.y = pole4.y-28;
+					pole2b.x = pole2.x;
+					pole4.x = pole2.x + 80;
+					pole4b.x = pole4.x;
+
+					if(poleCount >= 7){
+						pole1.x=160;
+					}
+					if(poleCount >=8){
+						pole2.x=160;
+					}
+
+					if(poleCount >= 15){
+						pole1.x=120;
+					}
+					if(poleCount >=16){
+						pole2.x=200;
+					}
+
+					if(poleCount >= 23){
+						pole1.x=290;
+						pole1b.x=pole1.x;
+						pole3.x=28;
+						pole3b.x=pole3.x;
+					}
+
+
+					if(pole1.y <= -30){
+						pole1.y = 350;
+						poleCount++;
+					}
+					if(pole2.y <= -30){
+						pole2.y = 350;
+						poleCount++;
+					}
+
+					if(nextPole == 0&&pole1.y<board.y){
+						nextPole = 1;
+						if(board.x<pole3.x||pole1.x<board.x){
+							nowTime+=3.0;
+						}
+					}
+					if(nextPole == 1&&pole2.y<board.y){
+						nextPole = 0;
+						if(board.x<pole2.x||pole4.x<board.x){
+							nowTime+=3.0;
+						}
+					}
+
+				}
+				//ここまでポールの動き
+
+				//ここからゴール後の処理
+
+				//ここまでゴール後の処理
       });
 
 			return scene;
