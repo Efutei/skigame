@@ -96,7 +96,7 @@ window.onload = function() {
 
 
 			var pole1 = new Sprite(4,4);
-			pole1.image = game_.assets['./img/pole.png'];
+			//pole1.image = game_.assets['./img/pole.png'];
 			pole1.x=120;
 			pole1.y=350;
 			pole1.scaleX =1;
@@ -112,7 +112,7 @@ window.onload = function() {
 			scene.addChild(pole1b);
 
 			var pole3 = new Sprite(4,4);
-			pole3.image = game_.assets['./img/pole.png'];
+			//pole3.image = game_.assets['./img/pole.png'];
 			pole3.x=pole1.x-80;
 			pole3.y=pole1.y;
 			pole3.scaleX =1;
@@ -128,7 +128,7 @@ window.onload = function() {
 			scene.addChild(pole3b);
 
 			var pole2 = new Sprite(4,4);
-			pole2.image = game_.assets['./img/poleb.png'];
+			//pole2.image = game_.assets['./img/poleb.png'];
 			pole2.x=200;
 			pole2.y=540;
 			pole2.scaleX =1;
@@ -144,7 +144,7 @@ window.onload = function() {
 			scene.addChild(pole2b);
 
 			var pole4 = new Sprite(4,4);
-			pole4.image = game_.assets['./img/poleb.png'];
+			//pole4.image = game_.assets['./img/poleb.png'];
 			pole4.x=pole2.x+80;
 			pole4.y=pole2.x;
 			pole4.scaleX =1;
@@ -191,6 +191,11 @@ window.onload = function() {
 					var printTime = Math.floor(nowTime*100)/100;
 					time.text ="Time:"+printTime;
 					speed = 10;
+
+					if(goal==0&&time.y>=0){
+						time.y--;
+					}
+
 				//ここから背景の動き
 					var bgSpeed = speed*Math.cos(board.rotation*Math.PI/180);
 
@@ -304,12 +309,14 @@ window.onload = function() {
 						nextPole = 1;
 						if(board.x<pole3.x||pole1.x<board.x){
 							nowTime+=3.0;
+							time.y = 4;
 						}
 					}
 					if(nextPole == 1&&pole2.y<board.y){
 						nextPole = 0;
 						if(board.x<pole2.x||pole4.x<board.x){
 							nowTime+=3.0;
+							time.y = 4;
 						}
 					}
 
