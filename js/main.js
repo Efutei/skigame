@@ -305,16 +305,16 @@ window.onload = function() {
 						poleCount++;
 					}
 
-					if(nextPole == 0&&pole1.y<board.y){
+					if(nextPole == 0&&pole1.y<ball.y+40){
 						nextPole = 1;
-						if(board.x<pole3.x||pole1.x<board.x){
+						if(ball.x+20<pole3.x||pole1.x<ball.x+20){
 							nowTime+=3.0;
 							time.y = 4;
 						}
 					}
-					if(nextPole == 1&&pole2.y<board.y){
+					if(nextPole == 1&&pole2.y<ball.y+40){
 						nextPole = 0;
-						if(board.x<pole2.x||pole4.x<board.x){
+						if(ball.x+20<pole2.x||pole4.x<ball.x+20){
 							nowTime+=3.0;
 							time.y = 4;
 						}
