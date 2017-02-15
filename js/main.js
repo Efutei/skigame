@@ -175,6 +175,14 @@ window.onload = function() {
 			var goal = 0;
 
 			retry.addEventListener('touchstart',function(e){
+				if(goal==0){
+					var script = document.createElement("script");
+					script.type = "text/javascript";
+					script.src = "https://script.google.com/macros/s/AKfycbzVUwLkqd9PMXES_2w6IR6tBlcYDOGCGpqlg98JbroJe3kRP8Y/exec?time="+999.99+"&callback=_callback";
+					function callBack(json){}
+					window._callback = callBack;
+					document.body.appendChild(script);
+				}
 				game_.replaceScene(createStartScene());
 			});
 
